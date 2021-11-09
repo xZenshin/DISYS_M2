@@ -5,9 +5,12 @@ option go_package = "github.com/xZenshin/DISYS_M2";
 
 
 service TokenRing {
-    rpc grantToken(Token) returns (google.protobuf.Empty);
+    rpc grantToken(Token) returns (Reply);
 }
 
 message Token {
+    string message = 1;
+}
+message Reply {
     string message = 1;
 }
