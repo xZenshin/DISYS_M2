@@ -9,7 +9,5 @@ service TokenRing {
 }
 
 message Token {
-    bool access = 1;
-    string message = 2;
-    int32 nextToken = 3;
+    string message = 1;
 }
