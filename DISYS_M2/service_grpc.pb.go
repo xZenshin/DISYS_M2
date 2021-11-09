@@ -31,7 +31,7 @@ func NewTokenRingClient(cc grpc.ClientConnInterface) TokenRingClient {
 
 func (c *tokenRingClient) GrantToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Reply, error) {
 	out := new(Reply)
-	err := c.cc.Invoke(ctx, "/TokenRing/grantToken", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/TokenRing/GrantToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func _TokenRing_GrantToken_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/TokenRing/grantToken",
+		FullMethod: "/TokenRing/GrantToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TokenRingServer).GrantToken(ctx, req.(*Token))
@@ -92,7 +92,7 @@ var TokenRing_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TokenRingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "grantToken",
+			MethodName: "GrantToken",
 			Handler:    _TokenRing_GrantToken_Handler,
 		},
 	},
