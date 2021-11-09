@@ -1,0 +1,14 @@
+syntax = "proto3"
+
+import "google/protobuf/empty.proto";
+
+
+service TokenRing {
+    rpc grantToken(Token) returns (google.protobuf.Empty);
+}
+
+message Token {
+    bool access = 1;
+    string message = 2;
+    int32 nextToken = 3;
+}
