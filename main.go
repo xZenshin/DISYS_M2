@@ -40,7 +40,7 @@ func setupNodeServer() {
 
 	for i := 0; i < len(Ports); i++ {
 
-		var nextID = i
+		var nextID = i + 1
 
 		if i == len(Ports)-1 {
 			nextID = 0
@@ -55,12 +55,18 @@ func setupNodeServer() {
 	}
 
 	for _, node := range Nodes {
-		go node.CreateServer()
-		fmt.Println(node.Port)
+		go node.ServerStart()
+		fmt.Println("Started server with port: " + node.Port)
+	}
+
+	for _, node := range Nodes {
+		go node.ClientStart()
+		fmt.Printf("%d Dialing in to port: %s \n", node.ID, node.NextNodePort)
 	}
 
 	//Run forever to let go routines run
 	for {
+
 	}
 }
 

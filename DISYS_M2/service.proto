@@ -4,7 +4,7 @@ option go_package = "github.com/xZenshin/DISYS_M2";
 
 
 service TokenRing {
-    rpc grantToken(Token) returns (Reply);
+    rpc GrantToken(Token) returns (Reply);
 }
 
 message Token {
