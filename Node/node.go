@@ -2,6 +2,7 @@ package Node
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	pb "tokenring/DISYS_M2"
@@ -10,9 +11,12 @@ import (
 )
 
 type Node struct {
+	pb.UnimplementedTokenRingServer
 	ID           int
 	Port         string
 	NextNodePort string
+}
+type TokenRingServer struct {
 }
 
 // Server ....
@@ -21,9 +25,9 @@ type Server struct {
 }
 
 // SayHello ...
-func (s *Node) grantToken(ctx context.Context, in *pb.Token) (*pb.Reply, error) {
-	log.Printf("Receive message body from client: %s", in.Message)
-	return &pb.Reply{Message: "Hello From the Server!"}, nil
+func (s *Node) GrantToken(ctx context.Context, in *pb.Token) (*pb.Reply, error) {
+	fmt.Printf("Receive message body from client: %s", in.Message)
+	return &pb.Reply{Message: "Hello! I am VERY COOL"}, nil
 }
 
 func (n *Node) ServerStart() {
@@ -32,7 +36,7 @@ func (n *Node) ServerStart() {
 		if err != nil {
 			log.Fatalf("Failed to listen: %v", err)
 		}
-		s := Server{}
+		s := Node{ID: n.ID, Port: n.Port, NextNodePort: n.NextNodePort}
 		grpcServer := grpc.NewServer()
 		pb.RegisterTokenRingServer(grpcServer, &s)
 		if err := grpcServer.Serve(lis); err != nil {
