@@ -23,12 +23,12 @@ func (s *Node) GrantToken(ctx context.Context, token *pb.Token) (*pb.Reply, erro
 	log.Printf("Node %d SENT TO NODE %d", token.IdFrom, ConvertPortToId(token.PortTo))
 	log.Printf("Current Node ID: %d PORT: %s NEXTPORT: %s", s.ID, s.Port, s.NextNodePort)
 	s.Token = *token
-	go s.ClientStart(s.NextNodePort)
+	go s.NodeStart(s.NextNodePort)
 	return &pb.Reply{Message: "Token Given"}, nil
 }
 
 //Listen for incoming messages
-func ServerStart(node Node) {
+func ListenForMessages(node Node) {
 
 	for {
 		lis, err := net.Listen("tcp", ":"+node.Port)
@@ -45,7 +45,7 @@ func ServerStart(node Node) {
 }
 
 //Accesses the critical section then dials the next port with GrantToken
-func (n *Node) ClientStart(nextPort string) {
+func (n *Node) NodeStart(nextPort string) {
 	n.TryToAccessCriticalSection()
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(":"+nextPort, grpc.WithInsecure())

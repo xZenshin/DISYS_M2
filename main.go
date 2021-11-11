@@ -37,12 +37,12 @@ func main() {
 	}
 	fmt.Println(Ports)
 
-	setupNodeServer()
+	StartNodes()
 
 	fmt.Printf("nodes length: %d", len(Nodes))
 }
 
-func setupNodeServer() {
+func StartNodes() {
 
 	for i := 0; i < len(Ports); i++ {
 
@@ -62,14 +62,14 @@ func setupNodeServer() {
 	}
 
 	for _, node := range Nodes {
-		go n.ServerStart(node)
+		go n.ListenForMessages(node)
 		log.Printf("Started server with port: " + node.Port)
 	}
 	for _, nodee := range Nodes {
 		nodee.TryToAccessCriticalSection()
 	}
 
-	Nodes[0].ClientStart(Nodes[0].NextNodePort)
+	Nodes[0].NodeStart(Nodes[0].NextNodePort)
 
 	//Run forever to let go routines run
 	for {
