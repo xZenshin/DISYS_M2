@@ -15,15 +15,19 @@ type Node struct {
 	ID           int
 	Port         string
 	NextNodePort string
+	Token        pb.Token
 }
 
+//Starts another Node-"Client" with NextPort info
 func (s *Node) GrantToken(ctx context.Context, token *pb.Token) (*pb.Reply, error) {
 	log.Printf("Node %d SENT TO NODE %d", token.IdFrom, ConvertPortToId(token.PortTo))
 	log.Printf("Current Node ID: %d PORT: %s NEXTPORT: %s", s.ID, s.Port, s.NextNodePort)
+	s.Token = *token
 	go s.ClientStart(s.NextNodePort)
 	return &pb.Reply{Message: "Token Given"}, nil
 }
 
+//Listen for incoming messages
 func ServerStart(node Node) {
 
 	for {
@@ -40,14 +44,9 @@ func ServerStart(node Node) {
 	}
 }
 
-func (n *Node) AccessCriticalSection() {
-	log.Printf("ACCESS CRITICAL SECTION ID: %d", n.ID)
-	time.Sleep(time.Second * 1)
-}
-
+//Accesses the critical section then dials the next port with GrantToken
 func (n *Node) ClientStart(nextPort string) {
-	n.AccessCriticalSection()
-
+	n.TryToAccessCriticalSection()
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(":"+nextPort, grpc.WithInsecure())
 	if err != nil {
@@ -56,11 +55,11 @@ func (n *Node) ClientStart(nextPort string) {
 	defer conn.Close()
 	c := pb.NewTokenRingClient(conn)
 
-	response, err := c.GrantToken(context.Background(), &pb.Token{Message: "Secret Token Access", IdFrom: int32(n.ID), PortTo: n.NextNodePort})
+	response, err := c.GrantToken(context.Background(), &pb.Token{Message: "Secret Code", IdFrom: int32(n.ID), PortTo: n.NextNodePort})
 	if err != nil {
 		log.Fatalf("Error when calling GrantToken: %s", err)
 	}
-	log.Printf("Response from server: %s", response.GetMessage())
+	log.Printf("Response from Node: %s", response.GetMessage())
 }
 
 func ConvertPortToId(port string) int {
@@ -74,4 +73,18 @@ func ConvertPortToId(port string) int {
 		return 2
 	}
 	return 420
+}
+
+// Permanently try to access the criticalsection
+func (n *Node) TryToAccessCriticalSection() {
+	if n.Token.Message == "Secret Code" {
+		n.AccessCriticalSection()
+	}
+}
+
+// After accessing change token message such that this Node no longer will be able to access again
+func (n *Node) AccessCriticalSection() {
+	log.Printf("ACCESS CRITICAL SECTION ID: %d", n.ID)
+	n.Token.Message = ""
+	time.Sleep(time.Second * 1)
 }

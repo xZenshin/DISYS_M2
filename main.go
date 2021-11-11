@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	pb "tokenring/DISYS_M2"
 	n "tokenring/Node"
 )
 
@@ -57,11 +58,15 @@ func setupNodeServer() {
 			NextNodePort: Ports[nextID],
 		}
 		Nodes = append(Nodes, node)
+		Nodes[0].Token = pb.Token{Message: "Secret Code"}
 	}
 
 	for _, node := range Nodes {
 		go n.ServerStart(node)
 		log.Printf("Started server with port: " + node.Port)
+	}
+	for _, nodee := range Nodes {
+		nodee.TryToAccessCriticalSection()
 	}
 
 	Nodes[0].ClientStart(Nodes[0].NextNodePort)
