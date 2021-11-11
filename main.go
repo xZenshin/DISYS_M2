@@ -13,6 +13,14 @@ var Ports []string
 var Nodes []n.Node
 
 func main() {
+	f, err := os.OpenFile("Token Ring Log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
+	log.Println("START OF TOKENRING EXAMPLE")
 
 	file, err := os.Open("ports.txt")
 	if err != nil {
@@ -31,16 +39,13 @@ func main() {
 	setupNodeServer()
 
 	fmt.Printf("nodes length: %d", len(Nodes))
-
-	// Iterate through all nodes and switch between each node being in the Critical Section
-
 }
 
 func setupNodeServer() {
 
 	for i := 0; i < len(Ports); i++ {
 
-		var nextID = i
+		var nextID = i + 1
 
 		if i == len(Ports)-1 {
 			nextID = 0
@@ -55,17 +60,14 @@ func setupNodeServer() {
 	}
 
 	for _, node := range Nodes {
-		go node.CreateServer()
-		fmt.Println(node.Port)
+		go n.ServerStart(node)
+		log.Printf("Started server with port: " + node.Port)
 	}
+
+	Nodes[0].ClientStart(Nodes[0].NextNodePort)
 
 	//Run forever to let go routines run
 	for {
+
 	}
-}
-
-func grantNodeAccess(nodeID int) {
-
-	// Grant the node with id 'nodeID' access
-
 }

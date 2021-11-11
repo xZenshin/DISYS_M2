@@ -1,13 +1,17 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
 option go_package = "github.com/xZenshin/DISYS_M2";
 
 
 service TokenRing {
-    rpc grantToken(Token) returns (google.protobuf.Empty);
+    rpc GrantToken(Token) returns (Reply);
 }
 
 message Token {
+    string message = 1;
+    int32 idFrom = 2;
+    string portTo = 3;
+}
+message Reply {
     string message = 1;
 }
