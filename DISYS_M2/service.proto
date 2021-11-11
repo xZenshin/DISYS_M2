@@ -9,7 +9,7 @@ service TokenRing {
 
 message Token {
     string message = 1;
-    int idFrom = 2;
+    int32 idFrom = 2;
     string portTo = 3;
 }
 message Reply {
