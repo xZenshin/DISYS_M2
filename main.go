@@ -39,7 +39,10 @@ func main() {
 
 	StartNodes()
 
-	fmt.Printf("nodes length: %d", len(Nodes))
+	//Run forever to let go routines run
+	for {
+
+	}
 }
 
 func StartNodes() {
@@ -70,9 +73,4 @@ func StartNodes() {
 	}
 
 	Nodes[0].NodeStart(Nodes[0].NextNodePort)
-
-	//Run forever to let go routines run
-	for {
-
-	}
 }
