@@ -31,9 +31,6 @@ func main() {
 	setupNodeServer()
 
 	fmt.Printf("nodes length: %d", len(Nodes))
-
-	// Iterate through all nodes and switch between each node being in the Critical Section
-
 }
 
 func setupNodeServer() {
@@ -56,25 +53,13 @@ func setupNodeServer() {
 
 	for _, node := range Nodes {
 		go n.ServerStart(node)
-		fmt.Println("Started server with port: " + node.Port)
+		log.Printf("Started server with port: " + node.Port)
 	}
-	Nodes[0].ClientStart(Nodes[0].NextNodePort)
-	/*
-		for _, node := range Nodes {
-			fmt.Printf("%d Dialing in to port: %s \n", node.ID, node.NextNodePort)
 
-			node.ClientStart()
-		}
-	*/
+	Nodes[0].ClientStart(Nodes[0].NextNodePort)
 
 	//Run forever to let go routines run
 	for {
 
 	}
-}
-
-func grantNodeAccess(nodeID int) {
-
-	// Grant the node with id 'nodeID' access
-
 }

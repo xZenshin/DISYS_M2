@@ -2,7 +2,6 @@ package Node
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"time"
@@ -19,8 +18,8 @@ type Node struct {
 }
 
 func (s *Node) GrantToken(ctx context.Context, token *pb.Token) (*pb.Reply, error) {
-	fmt.Println("RECIEVED REQUEST FROM", token.IdFrom, " SENT TO", token.PortTo)
-	fmt.Println("Current Node ID:", s.ID, " Port", s.Port, " NextPort", s.NextNodePort)
+	log.Printf("Node %d SENT TO NODE %d", token.IdFrom, ConvertPortToId(token.PortTo))
+	log.Printf("Current Node ID: %d PORT: %s NEXTPORT: %s", s.ID, s.Port, s.NextNodePort)
 	go s.ClientStart(s.NextNodePort)
 	return &pb.Reply{Message: "Token Given"}, nil
 }
@@ -42,7 +41,7 @@ func ServerStart(node Node) {
 }
 
 func (n *Node) AccessCriticalSection() {
-	fmt.Println("ACCESS CRITICAL SECTION: ID ", n.ID)
+	log.Printf("ACCESS CRITICAL SECTION ID: %d", n.ID)
 	time.Sleep(time.Second * 1)
 }
 
@@ -56,9 +55,23 @@ func (n *Node) ClientStart(nextPort string) {
 	}
 	defer conn.Close()
 	c := pb.NewTokenRingClient(conn)
+
 	response, err := c.GrantToken(context.Background(), &pb.Token{Message: "Secret Token Access", IdFrom: int32(n.ID), PortTo: n.NextNodePort})
 	if err != nil {
 		log.Fatalf("Error when calling GrantToken: %s", err)
 	}
 	log.Printf("Response from server: %s", response.GetMessage())
+}
+
+func ConvertPortToId(port string) int {
+	if port == "5000" {
+		return 0
+	}
+	if port == "5001" {
+		return 1
+	}
+	if port == "5002" {
+		return 2
+	}
+	return 420
 }
