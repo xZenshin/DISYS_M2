@@ -41,13 +41,13 @@ func ServerStart(node Node) {
 	}
 }
 
-func AccessCriticalSection(id int) {
-	fmt.Println("ACCESS CRITICAL SECTION: ID ", id)
+func (n *Node) AccessCriticalSection() {
+	fmt.Println("ACCESS CRITICAL SECTION: ID ", n.ID)
 	time.Sleep(time.Second * 1)
 }
 
 func (n *Node) ClientStart(nextPort string) {
-	AccessCriticalSection(n.ID)
+	n.AccessCriticalSection()
 
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(":"+nextPort, grpc.WithInsecure())
