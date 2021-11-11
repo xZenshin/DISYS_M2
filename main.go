@@ -55,14 +55,17 @@ func setupNodeServer() {
 	}
 
 	for _, node := range Nodes {
-		go node.ServerStart()
+		go n.ServerStart(node)
 		fmt.Println("Started server with port: " + node.Port)
 	}
+	Nodes[0].ClientStart(Nodes[0].NextNodePort)
+	/*
+		for _, node := range Nodes {
+			fmt.Printf("%d Dialing in to port: %s \n", node.ID, node.NextNodePort)
 
-	for _, node := range Nodes {
-		go node.ClientStart()
-		fmt.Printf("%d Dialing in to port: %s \n", node.ID, node.NextNodePort)
-	}
+			node.ClientStart()
+		}
+	*/
 
 	//Run forever to let go routines run
 	for {

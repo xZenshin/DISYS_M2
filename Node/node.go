@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 	pb "tokenring/DISYS_M2"
 
 	"google.golang.org/grpc"
@@ -16,44 +17,46 @@ type Node struct {
 	Port         string
 	NextNodePort string
 }
-type TokenRingServer struct {
+
+func (s *Node) GrantToken(ctx context.Context, token *pb.Token) (*pb.Reply, error) {
+	fmt.Println("RECIEVED REQUEST FROM", token.IdFrom, " SENT TO", token.PortTo)
+	fmt.Println("Current Node ID:", s.ID, " Port", s.Port, " NextPort", s.NextNodePort)
+	go s.ClientStart(s.NextNodePort)
+	return &pb.Reply{Message: "Token Given"}, nil
 }
 
-// Server ....
-type Server struct {
-	pb.UnimplementedTokenRingServer
-}
+func ServerStart(node Node) {
 
-// SayHello ...
-func (s *Node) GrantToken(ctx context.Context, in *pb.Token) (*pb.Reply, error) {
-	fmt.Printf("Receive message body from client: %s", in.Message)
-	return &pb.Reply{Message: "Hello! I am VERY COOL"}, nil
-}
-
-func (n *Node) ServerStart() {
 	for {
-		lis, err := net.Listen("tcp", ":"+n.Port)
+		lis, err := net.Listen("tcp", ":"+node.Port)
 		if err != nil {
 			log.Fatalf("Failed to listen: %v", err)
 		}
-		s := Node{ID: n.ID, Port: n.Port, NextNodePort: n.NextNodePort}
 		grpcServer := grpc.NewServer()
-		pb.RegisterTokenRingServer(grpcServer, &s)
+		pb.RegisterTokenRingServer(grpcServer, &node)
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatalf("Failed to serve: %s", err)
 		}
+
 	}
 }
 
-func (n *Node) ClientStart() {
+func AccessCriticalSection(id int) {
+	fmt.Println("ACCESS CRITICAL SECTION: ID ", id)
+	time.Sleep(time.Second * 1)
+}
+
+func (n *Node) ClientStart(nextPort string) {
+	AccessCriticalSection(n.ID)
+
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":"+n.NextNodePort, grpc.WithInsecure())
+	conn, err := grpc.Dial(":"+nextPort, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Did not connect to port %s - %s", n.NextNodePort, err)
 	}
 	defer conn.Close()
 	c := pb.NewTokenRingClient(conn)
-	response, err := c.GrantToken(context.Background(), &pb.Token{Message: "Hello From Client!"})
+	response, err := c.GrantToken(context.Background(), &pb.Token{Message: "Secret Token Access", IdFrom: int32(n.ID), PortTo: n.NextNodePort})
 	if err != nil {
 		log.Fatalf("Error when calling GrantToken: %s", err)
 	}
