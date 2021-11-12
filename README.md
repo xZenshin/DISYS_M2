@@ -1,4 +1,4 @@
-# DISYS_M2
+# TokenRing
 ## Run the Program
 To run the program simply type``` go run .``` while being in the same folder as ```main.go```
 
