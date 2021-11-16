@@ -16,10 +16,11 @@ var (
 )
 
 func main() {
-	/*
+
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Enter port number (You can only choose between 5000, 5001 and 5002): ")
 	inputPort, _ := reader.ReadString('\n')
+	inputPort = strings.Trim(inputPort, "\n")
 
 	file, err := os.Open("../ports.txt")
 	if err != nil {
@@ -30,10 +31,9 @@ func main() {
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
-		line 
 		split := strings.Split(scanner.Text(), " ")
-		fmt.Println(split)
 		if split[0] == inputPort {
+			fmt.Println("Found port")
 			id, err := strconv.Atoi(split[2])
 			if err != nil {
 				fmt.Println("Big error", err)
@@ -47,13 +47,6 @@ func main() {
 			break
 		}
 	}
-	*/
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter port number (You can only choose between 5000, 5001 and 5002): ")
-	inputPort, _ := reader.ReadString('\n')
-
-	node.Port = inputPort
-	node.NextNodePort = 
 
 	if node.ID != 0 {
 		go n.ListenForMessages(node)
@@ -62,6 +55,9 @@ func main() {
 		for {
 
 		}
+	} else {
+		fmt.Println("Wrong port number")
+		main()
 	}
 
 }
