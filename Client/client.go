@@ -1,6 +1,5 @@
 package main
 
-//go mod init is called Client
 import (
 	"bufio"
 	"fmt"
@@ -16,6 +15,12 @@ var (
 )
 
 func main() {
+
+	f, err := os.OpenFile("../Token Ring Log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	log.SetOutput(f)
 
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Enter port number (You can only choose between 5000, 5001 and 5002): ")
@@ -33,7 +38,7 @@ func main() {
 	for scanner.Scan() {
 		split := strings.Split(scanner.Text(), " ")
 		if split[0] == inputPort {
-			fmt.Println("Found port")
+			log.Println("Found port")
 			id, err := strconv.Atoi(split[2])
 			if err != nil {
 				fmt.Println("Big error", err)
@@ -43,7 +48,7 @@ func main() {
 				NextNodePort: split[1],
 				ID:           id,
 			}
-			fmt.Printf("Starting node with port: %s\tNext nodeport: %s\tID: %d\n", node.Port, node.NextNodePort, node.ID)
+			log.Printf("Starting node with port: %s\tNext nodeport: %s\tID: %d\n", node.Port, node.NextNodePort, node.ID)
 			break
 		}
 	}
@@ -51,7 +56,9 @@ func main() {
 	if node.ID != 0 {
 		go n.ListenForMessages(node)
 		go node.TryToAccessCriticalSection()
-
+		if node.Port == "5002" {
+			node.NodeStart(node.NextNodePort)
+		}
 		for {
 
 		}
