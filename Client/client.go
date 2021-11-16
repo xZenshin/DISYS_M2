@@ -20,7 +20,7 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Enter port number (You can only choose between 5000, 5001 and 5002): ")
 	inputPort, _ := reader.ReadString('\n')
-	inputPort = strings.Trim(inputPort, "\n")
+	inputPort = strings.TrimRight(inputPort, "\r\n")
 
 	file, err := os.Open("../ports.txt")
 	if err != nil {
