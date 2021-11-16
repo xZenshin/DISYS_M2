@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"strconv"
 	"time"
 	pb "tokenring/DISYS_M2"
 
@@ -63,16 +64,12 @@ func (n *Node) NodeStart(nextPort string) {
 }
 
 func ConvertPortToId(port string) int {
-	if port == "5000" {
-		return 0
+	val, err := strconv.Atoi(port)
+	if err == nil {
+		return (val % 10) + 1
+	} else {
+		return 420
 	}
-	if port == "5001" {
-		return 1
-	}
-	if port == "5002" {
-		return 2
-	}
-	return 420
 }
 
 // Permanently try to access the criticalsection
@@ -87,4 +84,5 @@ func (n *Node) AccessCriticalSection() {
 	log.Printf("ACCESS CRITICAL SECTION ID: %d", n.ID)
 	n.Token.Message = ""
 	time.Sleep(time.Second * 1)
+	log.Printf("EXITING CRITICAL SECTION ID: %d\n\n", n.ID)
 }
